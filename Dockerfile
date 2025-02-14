@@ -9,11 +9,12 @@ RUN apt-get update -y &&\
 	# petsc petsc-dev && \
 	git clone https://github.com/imadki/manapy.git && \
 	python3 -m pip install  manapy/
-	# apt-get -y --remove --purge \
-	# libmpich-dev \
-	# libopenmpi-dev && \
+	
+RUN	apt-get remove --purge -y \
+	libmpich-dev  \
+	libopenmpi-dev && \
 	# libmumps-ptscotch-dev \
 	# petsc-dev && \
-	# apt-get -y autoremove --purge && \
-	# apt-get clean
+	apt-get -y autoremove --purge && \
+	apt-get clean
 CMD ["tail", "-f", "/dev/null"]

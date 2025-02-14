@@ -20,9 +20,17 @@ ifndef DOCKER_CONTAINER_NAME
 	DOCKER_CONTAINER_NAME := manapy_container
 endif
 
+## vagrant
+vm:
+	vagrant up
+	vagrant ssh
+
+## ansible
 all:
 	@echo $(PLAYBOOK)
 	@echo $(INVENTORY)
+
+
 
 run: checkAnsibleInstalled
 	@ansible-playbook -i $(INVENTORY) $(PLAYBOOK);
@@ -37,6 +45,8 @@ install:
 	@sudo apt-get install -y ansible
 	@printf "$(GREEN)> Ansible is installed.$(RESET)\n"
 
+
+## docker
 task:
 	@ansible-playbook -i $(INVENTORY) $(PLAYBOOK) --start-at-task="$(TASK)"
 
