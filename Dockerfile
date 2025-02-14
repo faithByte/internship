@@ -8,7 +8,7 @@ RUN apt-get update -y &&\
 	# libmumps-ptscotch libmumps-ptscotch-dev \
 	# petsc petsc-dev && \
 	git clone https://github.com/imadki/manapy.git && \
-	python3 -m pip install  manapy/ \
+	python3 -m pip install  manapy/
 	# apt-get -y --remove --purge \
 	# libmpich-dev \
 	# libopenmpi-dev && \
