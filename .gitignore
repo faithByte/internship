@@ -1,2 +1,5 @@
-.vagrant
+manapy/
+.vscode/
+.vagrant/
+.files/
 Vagrantfile

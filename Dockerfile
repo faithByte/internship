@@ -1,32 +1,19 @@
-FROM ubuntu:22.04
+FROM python:3.13-bullseye
 
-WORKDIR /
-
-RUN apt-get update -y
-RUN apt-get upgrade -y
-
-# get the app from git
-RUN apt-get install -y git
-RUN git clone https://github.com/imadki/manapy.git
-
-# install app dependencies
-RUN apt-get -y install python3 \
-	python3-dev \
-	python3-pip \
-	libmpich-dev \
-	libopenmpi-dev \
-	libmumps-ptscotch-dev \
-	petsc-dev
-
-RUN python3 -m pip install Cython
-RUN python3 -m pip install pytest
-
-
-WORKDIR /manapy
-
-EXPOSE 8080
-
-# install app
-RUN python3 -m pip install .
-
+RUN apt-get update -y &&\
+	python3 -m pip install --upgrade pip setuptools wheel && \
+	python3 -m pip install Cython pytest && \
+	apt install -y libmpich12 libmpich-dev \
+	libopenmpi3 libopenmpi-dev && \
+	# libmumps-ptscotch libmumps-ptscotch-dev \
+	# petsc petsc-dev && \
+	git clone https://github.com/imadki/manapy.git && \
+	python3 -m pip install  manapy/ \
+	# apt-get -y --remove --purge \
+	# libmpich-dev \
+	# libopenmpi-dev && \
+	# libmumps-ptscotch-dev \
+	# petsc-dev && \
+	# apt-get -y autoremove --purge && \
+	# apt-get clean
 CMD ["tail", "-f", "/dev/null"]
