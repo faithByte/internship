@@ -1,0 +1,21 @@
+---
+- name: Copy manapy dockerfile
+  ansible.builtin.copy:
+    src: ../files/Dockerfile
+    dest: .
+    force: yes
+
+- name: Build manapy image
+  community.docker.docker_image:
+    build: 
+      path: .
+    source: build
+    name: "{{ DOCKER_IMAGE_NAME }}"
+    # state: present
+  register: output
+
+- name: Start manapy container
+  community.docker.docker_container:
+    name: "{{ DOCKER_CONTAINER_NAME }}"
+    image: "{{ DOCKER_IMAGE_NAME }}"
+  register: output
