@@ -1,0 +1,5 @@
+- name: Download Docker
+  hosts: all
+  roles:
+    - docker
+    - manapy

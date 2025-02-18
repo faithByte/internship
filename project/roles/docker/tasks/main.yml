@@ -1,0 +1,16 @@
+---
+- name: Check if docker exist
+  include_tasks: check_docker.yml
+  ignore_errors: yes
+
+- name:
+  ansible.builtin.debug:
+    msg: "Docker is installed"
+  when: not docker_version.failed
+
+- name: Docker already exist
+  ansible.builtin.meta: end_play
+  when: not docker_version.failed
+
+- name: Install Docker
+  import_tasks: install_docker.yml

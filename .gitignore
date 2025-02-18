@@ -2,4 +2,4 @@ manapy/
 .vscode/
 .vagrant/
 .files/
-Vagrantfile
+dev/.vagrant

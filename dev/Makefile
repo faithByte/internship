@@ -5,11 +5,13 @@ GREEN	= \033[92;1m
 RESET	= \033[0m
 
 ifndef INVENTORY
-	INVENTORY = $(shell ls *.ini | paste -sd, -)
+	INVENTORY = $(shell ls ../*.ini | paste -sd, -)
 endif
 
+PLAYBOOK = playbook.yml
+
 ifndef PLAYBOOK
-	PLAYBOOK = *.yml
+	PLAYBOOK = $(shell ls ../*.yml)
 endif
 
 ifndef DOCKER_IMAGE_NAME
@@ -21,20 +23,29 @@ ifndef DOCKER_CONTAINER_NAME
 endif
 
 ## vagrant
-vm:
+vms:
 	vagrant up
-	vagrant ssh
+	vagrant ssh master -c "sudo -i"
+
+master:
+	vagrant up master
+	vagrant ssh master -c "sudo -i"
+
+node:
+	vagrant up node
+	vagrant ssh node -c "sudo -i"
 
 ## ansible
 all:
 	@echo $(PLAYBOOK)
 	@echo $(INVENTORY)
 
+check:
+	@cd ../project && ansible-playbook $(PLAYBOOK) --syntax-check && ansible-playbook -i $(INVENTORY) $(PLAYBOOK) --check
 
 
 run: checkAnsibleInstalled
-	@ansible-playbook -i $(INVENTORY) $(PLAYBOOK);
-
+	@cd ../project && ansible-playbook $(PLAYBOOK);
 
 checkAnsibleInstalled:
 	@which ansible > /dev/null 2>&1 || { printf "$(RED)> Ansible is not installed.$(RESET)\n"; make install; }
@@ -73,4 +84,4 @@ delete: stop
 	@docker rm -f $(DOCKER_CONTAINER_NAME)
 	@docker rmi -f $(DOCKER_IMAGE_NAME)
 
-.PHONY: all install run checkAnsibleInstalled task runContainer terminal test command stop delete
+.PHONY: all install run check checkAnsibleInstalled master node task runContainer terminal test command stop delete
