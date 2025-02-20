@@ -5,16 +5,16 @@ RUN apt-get update -y &&\
 	python3 -m pip install Cython pytest && \
 	apt install -y libmpich12 libmpich-dev \
 	libopenmpi3 libopenmpi-dev && \
-	# libmumps-ptscotch libmumps-ptscotch-dev \
-	# petsc petsc-dev && \
 	git clone https://github.com/imadki/manapy.git && \
-	python3 -m pip install  manapy/ && \
+	python3 -m pip install manapy/ && \
 	apt-get remove --purge -y \
 	libmpich-dev  \
 	libopenmpi-dev && \
-	# libmumps-ptscotch-dev \
-	# petsc-dev && \
 	apt-get -y autoremove --purge && \
-	apt-get clean
+	apt-get clean && \
+	apt-get install petsc-dev -y && \
+	python3 -m pip install petsc petsc4py
+
+ENV MESH_DIR="/manapy/mesh"
 
 CMD ["tail", "-f", "/dev/null"]

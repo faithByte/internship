@@ -1,6 +1,0 @@
----
-- name: Check if docker exist
-  ansible.builtin.command:
-    cmd: docker -v
-  register: docker_version
-  ignore_errors: yes

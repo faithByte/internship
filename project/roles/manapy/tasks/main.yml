@@ -11,7 +11,6 @@
       path: .
     source: build
     name: "{{ DOCKER_IMAGE_NAME }}"
-    # state: present
   register: output
 
 - name: Start manapy container

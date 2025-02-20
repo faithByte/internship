@@ -4,10 +4,6 @@ RED		= \033[91;1m
 GREEN	= \033[92;1m
 RESET	= \033[0m
 
-ifndef INVENTORY
-	INVENTORY = $(shell ls ../*.ini | paste -sd, -)
-endif
-
 PLAYBOOK = playbook.yml
 
 ifndef PLAYBOOK
@@ -41,8 +37,9 @@ all:
 	@echo $(INVENTORY)
 
 check:
-	@cd ../project && ansible-playbook $(PLAYBOOK) --syntax-check && ansible-playbook -i $(INVENTORY) $(PLAYBOOK) --check
-
+	@cd ../project && \
+	ansible-playbook $(PLAYBOOK) --syntax-check && \
+	ansible-playbook $(PLAYBOOK) --check
 
 run: checkAnsibleInstalled
 	@cd ../project && ansible-playbook $(PLAYBOOK);
@@ -56,10 +53,11 @@ install:
 	@sudo apt-get install -y ansible
 	@printf "$(GREEN)> Ansible is installed.$(RESET)\n"
 
+# docker exec -it manapy_container mpirun --allow-run-as-root -np 2 python /laplacien_3d.py
 
 ## docker
 task:
-	@ansible-playbook -i $(INVENTORY) $(PLAYBOOK) --start-at-task="$(TASK)"
+	@cd ../project && ansible-playbook $(PLAYBOOK) --start-at-task="$(TASK)"
 
 runContainer:
 	@docker run -d --name $(DOCKER_CONTAINER_NAME) $(DOCKER_IMAGE_NAME)

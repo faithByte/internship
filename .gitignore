@@ -1,4 +1,5 @@
 .vscode/
 .vagrant/
 .files/
-dev/.vagrant
+*.py
+results/
