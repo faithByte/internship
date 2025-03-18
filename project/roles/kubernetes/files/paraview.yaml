@@ -1,0 +1,37 @@
+apiVersion: apps/v1 
+kind: Deployment      
+metadata:      
+  name: paraviewweb-deploy
+  labels:
+    app: paraviewweb
+spec:          
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paraviewweb
+  template:
+    metadata:       
+      name: paraviewweb
+      labels:
+        app: paraviewweb
+    spec:          
+      containers:
+        - name: paraviewweb
+          image: paraviewweb_image
+          ports:
+            - containerPort: 80
+          imagePullPolicy: "Never"
+          env:
+            - name: PROTOCOL
+              value: "ws"
+            - name: SERVER_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: shared-storage

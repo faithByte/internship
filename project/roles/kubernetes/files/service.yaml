@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: paraviewweb-service
+spec:
+  selector:
+    app: paraviewweb
+  ports:
+    - port: 7000      
+      targetPort: 80
+      nodePort: 30000   # change it => change it in config-template 
+  type: NodePort
+

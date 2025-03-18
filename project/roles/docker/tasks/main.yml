@@ -1,17 +1,13 @@
 ---
-- name: Update
-  ansible.builtin.apt:
-    update_cache: yes
-
 - name: Install dependancies
   ansible.builtin.apt:
     pkg:
       - ca-certificates 
     state: present
 
-- name: keyrings
-  ansible.builtin.command:
-    cmd: install -m 0755 -d /etc/apt/keyrings
+# - name: keyrings
+#   ansible.builtin.command:
+#     cmd: install -m 0755 -d /etc/apt/keyrings
 
 - name: Download the docker GPG file
   ansible.builtin.get_url:

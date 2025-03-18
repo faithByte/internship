@@ -1,0 +1,26 @@
+apiVersion: apps/v1  
+kind: Deployment       
+metadata:       
+  name: manapy-deploy
+spec:           
+  replicas: 1
+  selector:
+    matchLabels:
+      app: manapy-deploy
+  template:
+    metadata:       
+      name: manapy-deploy
+      labels:
+        app: manapy-deploy
+    spec:      
+      containers:
+        - name: manapy
+          image: manapy_image
+          imagePullPolicy: "Never"
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: shared-storage

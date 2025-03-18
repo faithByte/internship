@@ -1,0 +1,14 @@
+---
+- name: Copy paraviewweb dockerfile
+  ansible.builtin.copy:
+    src: ../files/Dockerfile
+    dest: .
+    force: yes
+
+- name: Build paraviewweb image
+  community.docker.docker_image:
+    build: 
+      path: .
+    source: build
+    name: "{{ paraviewweb_IMAGE_NAME }}"
+  register: output

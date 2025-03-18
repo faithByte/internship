@@ -1,5 +1,10 @@
+- name: Update
+  ansible.builtin.apt:
+    update_cache: yes
+
 - name: Download Docker
   hosts: all
   roles:
     - docker
     - manapy
+    - paraviewweb
