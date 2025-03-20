@@ -1,3 +1,10 @@
+# wlp2s0
+
+MASTER_NODES = 1
+WORKER_NODES = 2
+
+NETWORK_IP = "192.168.56."
+
 Vagrant.configure("2") do |config|
 	config.vm.box = "generic/debian12"
 	config.vm.box_version = "4.3.12"
@@ -13,23 +20,41 @@ Vagrant.configure("2") do |config|
 		apt-get install -y vim
 
 		sed -i.bak 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' "/etc/ssh/sshd_config"
-		cp -fr /vagrant/dev/.ssh/ ~/
+		ssh-keygen -t rsa -b 4096 -f "$HOME/.ssh/id_rsa" -N "" 
 		systemctl restart sshd
-
-		echo 'cd /vagrant/dev' >> /root/.profile
+		echo -e " \n " | passwd
+		# echo 'cd /vagrant/dev' >> /root/.profile
 	SHELL
 	
+
+
+	(1..WORKER_NODES).each do |i|
+		config.vm.define "node#{i}" do |node|
+			node.vm.synced_folder "../", "/vagrant"
+			node.vm.hostname = "node-0#{i}"
+			# node.vm.network "public_network", disabled: true
+			node.vm.network :private_network, ip: NETWORK_IP + "#{10 + i}"
+			node.vm.network "forwarded_port", guest: 22, host: "#{2720 + i}"
+		end
+	end
+
 	config.vm.define "master" do |master|
 		master.vm.hostname = "master"
-		master.vm.network "private_network", ip: "192.168.56.10"
-	end
+		master.vm.network "private_network", ip: "192.168.56.1"
+		master.vm.network "forwarded_port", guest: 22, host: 2711
+	
+		master.vm.provision "shell", inline: <<-SHELL
+			apt-get update
+			apt-get install -y ansible
+			echo [defaults] > ~/.ansible.cfg
+			echo "host_key_checking = False" >> ~/.ansible.cfg
 
-	config.vm.define "node" do |node|
-		node.vm.synced_folder "../", "/vagrant"
-		node.vm.hostname = "node"
-		config.vm.network "public_network", disabled: true
-		node.vm.network "private_network", ip: "192.168.56.11"
+			# for ((i=1; i <= ${WORKER_NODES}; i++)); do
+			# 	ssh-copy-id -o StrictHostKeyChecking=no root@${NETWORK_IP}$((10+i))
+			# 	echo "root@${NETWORK_IP}$((10+i))"
+			# done
+		SHELL
 	end
-
 end
 
+# ssh-copy-id -o StrictHostKeyChecking=no root@192.168.56.1
