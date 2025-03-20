@@ -1,23 +1,23 @@
----
+---  
+- name: Update
+  ansible.builtin.apt:
+    update_cache: yes
+
 - name: Install dependancies
   ansible.builtin.apt:
     pkg:
+      - apt-transport-https 
       - ca-certificates 
+      - curl 
+      - gpg
     state: present
 
-# - name: keyrings
-#   ansible.builtin.command:
-#     cmd: install -m 0755 -d /etc/apt/keyrings
-
-- name: Download the docker GPG file
+- name: Add Docker GPG key
   ansible.builtin.get_url:
     url: "https://download.docker.com/linux/debian/gpg"
     dest: "/etc/apt/keyrings/docker.asc"
-
-- name: Change GPG file permissions
-  file:
-    path: "/etc/apt/keyrings/docker.asc"
-    mode: "0444"
+    mode: '0444'
+    force: true
 
 - name: System architecture
   ansible.builtin.command:
@@ -33,10 +33,7 @@
     repo: "deb [arch={{ architecture.stdout }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian {{ codename.stdout }} stable"
     filename: /etc/apt/sources.list.d/docker.list
     state: present
-
-- name: Update
-  ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
 
 - name: Install docker
   ansible.builtin.apt:
@@ -44,7 +41,7 @@
       - docker-ce
     state: present
 
-- name: Enable & start docker    #to do: make it shared handler -{{ service_name }}-
+- name: Enable & start docker  
   ansible.builtin.systemd:
     name: "docker"
     enabled: yes

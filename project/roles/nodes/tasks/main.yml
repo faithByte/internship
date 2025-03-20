@@ -1,0 +1,22 @@
+---
+- name: Delete
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '\s{{ inventory_hostname }}\s+sw\s+'
+    state: absent
+
+- name: Add IP to hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ ansible_host }} {{ inventory_hostname }}"
+    create: yes
+
+- name: Add master IP to hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars['master'].ansible_host }} {{ hostvars['master'].inventory_hostname }}"
+    create: yes
+
+- name: Join cluster
+  ansible.builtin.shell:
+    "{{ hostvars['master'].join_cluster }}"

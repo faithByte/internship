@@ -1,0 +1,10 @@
+---
+- name: Label visualizers nodes
+  ansible.builtin.shell:
+    cmd: kubectl label node {{ item }} type=visualizer
+  loop: "{{ groups['visualizers'] }}"
+
+- name: Label workers nodes
+  ansible.builtin.shell:
+    cmd: kubectl label node {{ item }} type=worker
+  loop: "{{ groups['workers'] }}"

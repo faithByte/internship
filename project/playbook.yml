@@ -1,10 +1,21 @@
-- name: Update
-  ansible.builtin.apt:
-    update_cache: yes
-
-- name: Download Docker
+- name: Download Kubernetes
   hosts: all
   roles:
     - docker
+    - kubernetes
+
+- name: Setup Cluster
+  hosts: master
+  roles:
+    - cluster
     - manapy
-    - paraviewweb
+
+- name: Join nodes
+  hosts: visualizers, workers
+  roles:
+    - nodes
+
+- name: Label nodes 
+  hosts: master
+  roles:
+    - labels

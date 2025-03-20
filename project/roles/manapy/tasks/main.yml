@@ -1,20 +1,14 @@
 ---
-- name: Copy manapy dockerfile
-  ansible.builtin.copy:
-    src: ../files/Dockerfile
-    dest: .
-    force: yes
+- name: Setup shared volume
+  ansible.builtin.shell: |
+    kubectl apply -f {{ playbook_dir }}/roles/manapy/files/shared-volume.yaml
+    kubectl apply -f {{ playbook_dir }}/roles/manapy/files/volume-claim.yaml
 
-- name: Build manapy image
-  community.docker.docker_image:
-    build: 
-      path: .
-    source: build
-    name: "{{ DOCKER_IMAGE_NAME }}"
-  register: output
+- name: Setup paraviewweb visualizer
+  ansible.builtin.shell: |
+    kubectl apply -f {{ playbook_dir }}/roles/manapy/files/paraview.yaml
+    kubectl apply -f {{ playbook_dir }}/roles/manapy/files/service.yaml
 
-# - name: Start manapy container
-#   community.docker.docker_container:
-#     name: "{{ DOCKER_CONTAINER_NAME }}"
-#     image: "{{ DOCKER_IMAGE_NAME }}"
-#   register: output
+- name: Setup manapy
+  ansible.builtin.shell:
+    kubectl apply -f {{ playbook_dir }}/roles/manapy/files/manapy.yaml
