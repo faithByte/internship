@@ -1,16 +1,21 @@
 ---
-# - name: Delete
-#   ansible.builtin.lineinfile:
-#     path: /etc/hosts
-#     regexp: '\s{{ inventory_hostname }}\s+sw\s+'
-#     state: absent
-    
-# - name: 
-#   ansible.builtin.lineinfile:
-#     path: /etc/hosts
-#     line: "{{ item.ansible_host }} {{ item.inventory_hostname }}"
-#     create: yes     
-#   loop: "{{ hostvars['all'] }}"
+# - name: Configure firewall
+#   community.general.ufw:
+#     rule: allow
+#     port: "{{ item }}"
+#     proto: tcp
+#   with_items:
+#     - 6443
+#     - 2379
+#     - 2380
+#     - 10250
+#     - 10251
+#     - 10252
+#     - 10255
+
+# - name: Reload UFW
+#   community.general.ufw:
+#     state: reloaded
       
 - name: Init cluster
   ansible.builtin.shell:

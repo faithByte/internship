@@ -1,0 +1,34 @@
+---
+- name: Install dependencies
+  ansible.builtin.apt:
+    pkg: nfs-kernel-server
+    state: present
+
+- name: Create shared folder
+  ansible.builtin.file:
+    path: /mnt/shared
+    state: directory
+    owner: nobody
+    group: nogroup
+
+- name: Add workers nodes to nfs file
+  ansible.builtin.lineinfile:
+    path: /etc/exports
+    line: "/mnt/shared {{ hostvars[item].inventory_hostname }}(rw,sync,no_subtree_check)"
+    state: present
+    create: yes
+  loop: "{{ groups['workers'] }}"
+
+- name: Add visualizers nodes to nfs file
+  ansible.builtin.lineinfile:
+    path: /etc/exports
+    line: "/mnt/shared {{ hostvars[item].inventory_hostname }}(ro,sync,no_subtree_check)"
+    state: present
+    create: yes
+  loop: "{{ groups['visualizers'] }}"
+
+- name: Enable & start nfs server  
+  ansible.builtin.systemd:
+    name: nfs-kernel-server
+    enabled: yes
+    state: restarted

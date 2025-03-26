@@ -13,15 +13,8 @@ spec:
       labels:
         app: manapy-deploy
     spec:   
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: type
-                operator: In
-                values:
-                - worker
+      nodeSelector:
+        type: worker
       containers:
         - name: manapy
           image: faiithbyte/manapy
@@ -31,4 +24,4 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: shared-storage
+            claimName: shared-volume-rw

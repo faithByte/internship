@@ -1,9 +1,5 @@
 ---  
-- name: Update
-  ansible.builtin.apt:
-    update_cache: yes
-
-- name: Install dependancies
+- name: Install dependencies
   ansible.builtin.apt:
     pkg:
       - apt-transport-https 
@@ -37,12 +33,11 @@
 
 - name: Install docker
   ansible.builtin.apt:
-    pkg:
-      - docker-ce
+    pkg: docker-ce
     state: present
 
 - name: Enable & start docker  
   ansible.builtin.systemd:
-    name: "docker"
+    name: docker
     enabled: yes
     state: restarted

@@ -15,15 +15,8 @@ spec:
       labels:
         app: paraviewweb
     spec:     
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: type
-                operator: In
-                values:
-                - visualizer  
+      nodeSelector:
+        type: visualizer
       containers:
         - name: paraviewweb
           image: faiithbyte/visualizer
@@ -42,4 +35,4 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: shared-storage
+            claimName: shared-volume-rw

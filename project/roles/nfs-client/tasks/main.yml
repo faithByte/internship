@@ -1,0 +1,14 @@
+---
+- name: Install dependencies
+  ansible.builtin.apt:
+    pkg: nfs-common
+    state: present
+
+- name: Create shared folder
+  ansible.builtin.file:
+    path: /data
+    state: directory
+
+- name: Mount shared folder
+  ansible.builtin.shell:
+    cmd: "mount {{ hostvars['master'].inventory_hostname }}:/mnt/shared /data"

@@ -23,38 +23,34 @@ Vagrant.configure("2") do |config|
 		ssh-keygen -t rsa -b 4096 -f "$HOME/.ssh/id_rsa" -N "" 
 		systemctl restart sshd
 		echo -e " \n " | passwd
-		# echo 'cd /vagrant/dev' >> /root/.profile
+		echo 'cd /vagrant/dev' >> /root/.profile
 	SHELL
-	
-
 
 	(1..WORKER_NODES).each do |i|
 		config.vm.define "node#{i}" do |node|
 			node.vm.synced_folder "../", "/vagrant"
-			node.vm.hostname = "node-0#{i}"
-			# node.vm.network "public_network", disabled: true
+			node.vm.hostname = "node#{i}"
 			node.vm.network :private_network, ip: NETWORK_IP + "#{10 + i}"
-			node.vm.network "forwarded_port", guest: 22, host: "#{2720 + i}"
 		end
 	end
 
 	config.vm.define "master" do |master|
 		master.vm.hostname = "master"
 		master.vm.network "private_network", ip: "192.168.56.1"
-		master.vm.network "forwarded_port", guest: 22, host: 2711
 	
 		master.vm.provision "shell", inline: <<-SHELL
 			apt-get update
 			apt-get install -y ansible
 			echo [defaults] > ~/.ansible.cfg
 			echo "host_key_checking = False" >> ~/.ansible.cfg
-
-			# for ((i=1; i <= ${WORKER_NODES}; i++)); do
-			# 	ssh-copy-id -o StrictHostKeyChecking=no root@${NETWORK_IP}$((10+i))
-			# 	echo "root@${NETWORK_IP}$((10+i))"
-			# done
 		SHELL
 	end
 end
 
 # ssh-copy-id -o StrictHostKeyChecking=no root@192.168.56.1
+# kubectl cp laplacien_3d.py default/<some-pod>:/data
+# mpirun --allow-run-as-root -np 2 python laplacien_3d.py
+
+# 192.168.56.1	master
+# 192.168.56.11	node1
+# 192.168.56.12	node2

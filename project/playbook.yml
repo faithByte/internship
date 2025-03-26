@@ -1,19 +1,22 @@
 - name: Download Kubernetes
   hosts: all
   roles:
+    - setup
     - docker
     - kubernetes
 
 - name: Setup Cluster
   hosts: master
   roles:
+    - nfs-server
     - cluster
     - manapy
 
 - name: Join nodes
-  hosts: visualizers, workers
+  hosts: nodes
   roles:
     - nodes
+    - nfs-client
 
 - name: Label nodes 
   hosts: master
