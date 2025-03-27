@@ -1,19 +1,29 @@
 - name: Download Kubernetes
   hosts: all
+  tasks:
+  - name: Update
+    ansible.builtin.apt:
+      update_cache: yes
+
+- name: Download Kubernetes
+  hosts: all
   roles:
+    - firewall
     - docker
     - kubernetes
 
 - name: Setup Cluster
   hosts: master
   roles:
+    - nfs-server
     - cluster
     - manapy
 
 - name: Join nodes
-  hosts: visualizers, workers
+  hosts: nodes
   roles:
     - nodes
+    - nfs-client
 
 - name: Label nodes 
   hosts: master
