@@ -1,16 +1,39 @@
 ---
-# - name: Configure firewall
-#   community.general.ufw:
-#     rule: allow
-#     port: "{{ item }}"
-#     proto: tcp
-#   with_items:
-#     - 10250
-#     - 30000:32767
+- name: Configure firewall [TCP]
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items:
+    - 10250         
+    - 30000:32767
+    - 6783
 
-# - name: Reload UFW
-#   community.general.ufw:
-#     state: reloaded
+- name: Configure firewall [UDP]
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: udp
+  with_items:
+    - 6783
+    - 6784
+
+- name: Reload UFW
+  community.general.ufw:
+    state: reloaded
+
+- name: Delete
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '{{ inventory_hostname }}'
+    state: absent
+
+- name: Add IP to hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ ansible_host }} {{ inventory_hostname }}"
+    create: yes
+    state: present
 
 - name: Add master IP to hosts
   ansible.builtin.lineinfile:

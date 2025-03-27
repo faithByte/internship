@@ -1,7 +1,14 @@
 - name: Download Kubernetes
   hosts: all
+  tasks:
+  - name: Update
+    ansible.builtin.apt:
+      update_cache: yes
+
+- name: Download Kubernetes
+  hosts: all
   roles:
-    - setup
+    - firewall
     - docker
     - kubernetes
 

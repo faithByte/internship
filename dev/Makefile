@@ -1,22 +1,6 @@
 MAKEFLAGS += --silent --ignore-errors
 
-RED		= \033[91;1m
-GREEN	= \033[92;1m
-RESET	= \033[0m
-
 PLAYBOOK = playbook.yml
-
-ifndef PLAYBOOK
-	PLAYBOOK = $(shell ls ../*.yml)
-endif
-
-ifndef DOCKER_IMAGE_NAME
-	DOCKER_IMAGE_NAME := manapy_image
-endif
-
-ifndef DOCKER_CONTAINER_NAME
-	DOCKER_CONTAINER_NAME := manapy_container
-endif
 
 ## vagrant
 vms:
@@ -27,59 +11,24 @@ master:
 	vagrant up master
 	vagrant ssh master -c "sudo -i"
 
-node:
-	vagrant up node
-	vagrant ssh node -c "sudo -i"
+clean:
+	vagrant destroy -f
+
+re: clean vms
 
 ## ansible
-all:
-	@echo $(PLAYBOOK)
-	@echo $(INVENTORY)
+# all:
+# 	@echo $(PLAYBOOK)
 
 check:
 	@cd ../project && \
 	ansible-playbook $(PLAYBOOK) --syntax-check && \
 	ansible-playbook $(PLAYBOOK) --check
 
-run: checkAnsibleInstalled
+run:
 	@cd ../project && ansible-playbook $(PLAYBOOK);
 
-checkAnsibleInstalled:
-	@which ansible > /dev/null 2>&1 || { printf "$(RED)> Ansible is not installed.$(RESET)\n"; make install; }
+# task:
+# 	@cd ../project && ansible-playbook $(PLAYBOOK) --start-at-task="$(TASK)"
 
-install:
-	@printf "\033[0;1minstalling...$(RESET)\n";
-	@sudo apt update -y
-	@sudo apt-get install -y ansible
-	@printf "$(GREEN)> Ansible is installed.$(RESET)\n"
-
-# docker exec -it manapy_container mpirun --allow-run-as-root -np 2 python /laplacien_3d.py
-
-## docker
-task:
-	@cd ../project && ansible-playbook $(PLAYBOOK) --start-at-task="$(TASK)"
-
-runContainer:
-	@docker run -d --name $(DOCKER_CONTAINER_NAME) $(DOCKER_IMAGE_NAME)
-
-terminal:
-	@docker exec -it $(DOCKER_CONTAINER_NAME) /bin/bash
-
-test:
-	@docker exec -it $(DOCKER_CONTAINER_NAME) python3 -m pytest  manapy -m "not parallel"
-
-command:
-	@if [ -z "$(COMMAND)" ]; then \
-		echo "$(RED)usage:\tmake command COMMAND=\"your command\"$(RESET)"; \
-	else \
-		docker exec -it $(DOCKER_CONTAINER_NAME) $(COMMAND); \
-	fi
-
-stop:
-	@docker stop $(DOCKER_CONTAINER_NAME)
-
-delete: stop
-	@docker rm -f $(DOCKER_CONTAINER_NAME)
-	@docker rmi -f $(DOCKER_IMAGE_NAME)
-
-.PHONY: all install run check checkAnsibleInstalled master node task runContainer terminal test command stop delete
+.PHONY: all vms master clean re run check 

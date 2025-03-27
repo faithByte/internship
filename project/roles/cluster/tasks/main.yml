@@ -1,22 +1,46 @@
 ---
-# - name: Configure firewall
-#   community.general.ufw:
-#     rule: allow
-#     port: "{{ item }}"
-#     proto: tcp
-#   with_items:
-#     - 6443
-#     - 2379
-#     - 2380
-#     - 10250
-#     - 10251
-#     - 10252
-#     - 10255
+- name: Configure firewall [TCP]
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items:
+    - 6443
+    - 2379
+    - 2380
+    - 10250
+    - 10251
+    - 10252
+    - 10255
+    - 6783
 
-# - name: Reload UFW
-#   community.general.ufw:
-#     state: reloaded
-      
+- name: Configure firewall [UDP]
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: udp
+  with_items:
+    - 6783
+    - 6784
+
+- name: Reload UFW
+  community.general.ufw:
+    state: reloaded
+
+- name: Delete
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '{{ inventory_hostname }}'
+    state: absent
+
+- name: Add master IP to hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[item].ansible_host }} {{ hostvars[item].inventory_hostname }}"
+    state: present
+    create: yes
+  loop: "{{ groups['all'] }}"
+
 - name: Init cluster
   ansible.builtin.shell:
     cmd: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}

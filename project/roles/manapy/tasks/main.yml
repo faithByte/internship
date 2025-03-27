@@ -2,8 +2,7 @@
 - name: Setup shared volume
   ansible.builtin.shell: |
     kubectl apply -f {{ playbook_dir }}/roles/manapy/files/nfs-volume.yaml
-    kubectl apply -f {{ playbook_dir }}/roles/manapy/files/nfs-claim-rw.yaml
-# kubectl apply -f {{ playbook_dir }}/roles/manapy/files/nfs-claim-ro.yaml
+    kubectl apply -f {{ playbook_dir }}/roles/manapy/files/nfs-claim.yaml
 
 - name: Setup paraviewweb visualizer
   ansible.builtin.shell: |

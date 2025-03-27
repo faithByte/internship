@@ -1,4 +1,14 @@
 ---
+- name: Set the firewall to allow NFS traffic
+  community.general.ufw:
+    rule: allow
+    port: nfs
+    src: "{{ INTERNAL_NETWORK }}"
+
+- name: Reload UFW
+  community.general.ufw:
+    state: reloaded
+
 - name: Install dependencies
   ansible.builtin.apt:
     pkg: nfs-kernel-server
@@ -11,21 +21,16 @@
     owner: nobody
     group: nogroup
 
-- name: Add workers nodes to nfs file
+- name: Add network to nfs file
   ansible.builtin.lineinfile:
     path: /etc/exports
-    line: "/mnt/shared {{ hostvars[item].inventory_hostname }}(rw,sync,no_subtree_check)"
+    line: "/mnt/shared {{ INTERNAL_NETWORK }}(rw,sync,no_subtree_check)"
     state: present
     create: yes
-  loop: "{{ groups['workers'] }}"
 
-- name: Add visualizers nodes to nfs file
-  ansible.builtin.lineinfile:
-    path: /etc/exports
-    line: "/mnt/shared {{ hostvars[item].inventory_hostname }}(ro,sync,no_subtree_check)"
-    state: present
-    create: yes
-  loop: "{{ groups['visualizers'] }}"
+- name: export
+  ansible.builtin.shell:
+    cmd: exportfs -a
 
 - name: Enable & start nfs server  
   ansible.builtin.systemd:
